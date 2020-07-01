@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html>
+    <meta charset="UTF-8">
+    <head>
+        <meta http-equiv="content-type" content="text/html" charset="utf-8">
+        <meta name="robots" content="noindex, nofollow">
+        <meta name="googlebot" content="noindex, nofollow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>test Player</title>
+        <link rel="stylesheet" type="text/css" href="./assets/css/player.css">
+        <style type="text/css">
+            *{
+                margin:0;
+                padding:0;
+            }
+            
+        </style>
+    </head>
+    
+    <body>
+        <section id="player">
+            <!--
+                headers
+            -->
+            <header class="header">
+                <h1>
+                    <a href="https://baidu.com">
+                        Baidu
+                    </a>
+                </h1>
+                <!--
+                    input box
+                -->
+                <input v-model="inputValue" @keyup.enter="search" placeholder="Songname" class="new-todo">
+            </header>
+            <!--
+                list area
+            -->
+            <section class="main">
+                <ul class="music-list">
+                    <li v-for="(item, index) in results" :key="index" class="music">
+                        <div class="view">
+                            <span class="index">{{index + 1}}.</span>
+                            <label>{{item.name}}</label>
+                            <button class="play" @click="play(item.id)">PPP</button>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+            <!--
+                player Area
+            -->
+            <footer class="footer">
+                <audio :src="url" controls></audio>
+            </footer>
+            
+        </section>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+        <script>
+
+            /*
+                1 return to search music
+                    Api: https://autumnfish.cn/search
+                    mode: GET
+                    parameters: keywords (search_keywords)
+                2 list render
+                3 click to play
+                    Api: https://autumnfish.cn/song/url
+                    mode: GET
+                    parameters: id (song id)
+            */
+           var app = new Vue({
+               el: '#player',
+               data:{
+                   inputValue: "",
+                   results: [],
+                   url: null
+               },
+               methods:{
+                   search(){
+                       axios({
+                           url:"https://autumnfish.cn/search",
+                           method:"GET",
+                           params:{
+                               keywords: this.inputValue
+                           }
+                       }).then(res=>{
+                           // console.log(res);
+                           this.results = res.data.result.songs;
+                       })
+                   },
+                   play(id){
+                       // axios.get("https://autumnfish.cn/song/url/?id=" + id);
+                       axios.get(`https://autumnfish.cn/song/url/?id=${id}`)
+                       .then(res=>{
+                           
+                           this.url = res.data.data[0].url;
+                           console.log(this.url);
+                       })
+                   }
+               }
+           })
+        </script>
+    </body>
+</html>
